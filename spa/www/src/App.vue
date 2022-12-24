@@ -1,36 +1,49 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
 import { useUser } from "./stores/user";
+import Home from "../assets/icons/Home.vue";
+import Chat from "../assets/icons/Chat.vue";
+import LogOut from "../assets/icons/LogOut.vue";
+import Register from "../assets/icons/Register.vue";
 
 const { token, isLoggedIn, logOut } = useUser();
 </script>
 
 <template>
-  {{ isLoggedIn }}
-  {{ token }}
-  <header>
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <div v-if="isLoggedIn">
-          <button @click="logOut">Logout</button>
-          <RouterLink to="/chat">Chat</RouterLink>
+  <div class="App">
+    <img src="../assets/images/phone.webp" draggable="false" alt="">
+    <div class="content">
+    <!-- {{ isLoggedIn }} -->
+    {{ token }}
+      <header>
+        <div class="wrapper">
+          <nav>
+            <RouterLink to="/"><Home /></RouterLink>
+            <div v-if="isLoggedIn">
+              <span @click="logOut"><LogOut /></span>
+              <RouterLink to="/chat"><Chat /></RouterLink>
+            </div>
+            <RouterLink v-else to="/register"><Register /></RouterLink>
+          </nav>
         </div>
-        <RouterLink v-else to="/register">Register</RouterLink>
-      </nav>
+      </header>
+
+      <!--- https://vuejs.org/guide/built-ins/suspense.html#combining-with-other-components --> 
+      <RouterView v-slot="{ Component }">
+        <template v-if="Component">
+          <Suspense>
+            <!-- main content -->
+            <component :is="Component"></component>
+
+            <!-- loading state -->
+            <template #fallback> Loading... </template>
+          </Suspense>
+        </template>
+      </RouterView>
     </div>
-  </header>
-
-  <!--- https://vuejs.org/guide/built-ins/suspense.html#combining-with-other-components --> 
-  <RouterView v-slot="{ Component }">
-    <template v-if="Component">
-      <Suspense>
-        <!-- main content -->
-        <component :is="Component"></component>
-
-        <!-- loading state -->
-        <template #fallback> Loading... </template>
-      </Suspense>
-    </template>
-  </RouterView>
+  </div>
 </template>
+
+<style lang="scss" scoped>
+@import "./app.scss";
+</style>

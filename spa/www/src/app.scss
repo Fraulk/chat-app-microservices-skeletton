@@ -1,0 +1,53 @@
+.App {
+    width: 100vw;
+    height: 100vh;
+    color: white;
+    // font-weight: 600;
+    font-family: sans-serif;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    background-color: #181818;
+    z-index: 0;
+
+    & > img {
+        position: absolute;
+        width: 100%;
+        top: -8%;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        // filter: blur(1px);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    div.content {
+        width: 396px;
+        height: 809px;
+        padding: 8px 0;
+        position: relative;
+        background-color: #2a2a2a;
+        transform: translateX(-31px) translateY(85px);
+        overflow: hidden;
+
+        nav {
+            width: 100%;
+            padding: 12px 12px;
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #424242;
+
+            a, span {
+                color: crimson;
+                cursor: pointer;
+            }
+
+            svg {
+                width: 42px;
+            }
+        }
+    }
+}
