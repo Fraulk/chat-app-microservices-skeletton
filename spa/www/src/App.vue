@@ -19,10 +19,10 @@ const { token, isLoggedIn, logOut } = useUser();
         <div class="wrapper">
           <nav>
             <RouterLink to="/"><Home /></RouterLink>
-            <div v-if="isLoggedIn">
+            <template v-if="isLoggedIn">
               <span @click="logOut"><LogOut /></span>
               <RouterLink to="/chat"><Chat /></RouterLink>
-            </div>
+            </template>
             <RouterLink v-else to="/register"><Register /></RouterLink>
           </nav>
         </div>
