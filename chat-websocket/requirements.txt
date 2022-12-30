@@ -3,3 +3,5 @@ fastapi
 uvicorn
 python-jose[cryptography]
 redis
+datetime
+uuid

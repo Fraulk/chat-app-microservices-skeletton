@@ -3,6 +3,8 @@ import asyncio
 from fastapi import FastAPI, WebSocket, Cookie, Depends, WebSocketDisconnect
 from jose import jwt
 import redis
+import datetime
+import uuid
 
 r = redis.Redis(host='redis', port=6379)
 
@@ -70,12 +72,62 @@ async def websocket_endpoint(
     websocket: WebSocket,
     session: str = Depends(auth_token)
 ):
+    # Obtention de l'identifiant du client
     client_id = session["id"]
     await manager.connect(websocket)
+     # Récupération des 20 derniers messages
+    messages = r.lrange('messages', -20, -1)
+    for message in messages:
+        await websocket.send_text(message)
+
     try:
         while True:
-            message_from_websocket = await websocket.receive_text()
-            r.publish("chat", client_id + " says " + message_from_websocket)
+
+            # Réception de messages du client
+            message = await websocket.receive_text()
+            if message:
+                # Décodage du message en JSON
+                data = json.loads(message)
+
+            if 'reaction' in data:
+                # Récupération du message
+                key = f"message:{data['id']}"
+                jsonString = r.get(key)
+                message = json.loads(jsonString)
+
+                # Vérification si l'utilisateur peut retirer ou ajouter une réaction
+                found = False
+                for r in message['reaction']:
+                    if r['reaction'] == data['reaction']:
+                        if data['client'] in r['client']:
+                            r['client'].remove(data['client'])
+                        else:
+                            r['client'].append(data['client'])
+                        found = True
+                        break
+                if not found:
+                    message['reaction'].append({ "reaction": data['reaction'], "client": [data['client']] })
+
+                # Enregistrement du message mis à jour
+                r.set(key, json.dumps(message))
+
+            else:
+                # Préparation du message
+                message = {
+                    "id": uuid.uuid4().hex,  # Génération d'un ID unique pour le message
+                    "client_id": client_id,
+                    "message": data['message'],
+                    "date": datetime.datetime.utcnow().isoformat(),
+                    "reaction": []
+                }
+
+                # Enregistrement du message dans la liste "messages"
+                key = f"message:{message['id']}"
+                r.set(key, json.dumps(message))
+                r.rpush('messages', json.dumps(message))
+
+                # Publication du message sur le canal "chat"
+                r.publish('chat', json.dumps(message))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         await manager.broadcast(f"Client #{client_id} left the chat")
