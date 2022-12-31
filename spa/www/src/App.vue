@@ -14,7 +14,7 @@ const { token, isLoggedIn, logOut } = useUser();
     <img src="../assets/images/phone.webp" draggable="false" alt="">
     <div class="content">
     <!-- {{ isLoggedIn }} -->
-    {{ token }}
+    <!-- {{ token }} -->
       <header>
         <div class="wrapper">
           <nav>
