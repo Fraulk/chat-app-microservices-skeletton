@@ -1,0 +1,63 @@
+.ChatView {
+    height: 92%;
+    display: flex;
+    justify-content: space-between;
+    flex-flow: column nowrap;
+
+    .messages {
+        padding: 0 16px;
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 10px;
+        height: 96%;
+        overflow-y: scroll;
+
+        .message {
+            font-family: "Comic sans ms";
+            
+            .username {
+                color: #8f8f8f;
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 12px;
+                letter-spacing: -1px;
+
+                span {
+                    font-weight: 600;
+                    letter-spacing: 1.1px;
+                }
+            }
+        }
+    }
+    
+    .send-message {
+        width: 100%;
+        padding: 6px 12px;
+        display: flex;
+        // justify-content: space-around;
+        gap: 12px;
+
+        input {
+            all: unset;
+            width: 100%;
+            padding: 6px 10px;
+            background-color: #464646;
+            border-radius: 6px;
+        }
+        input::placeholder {
+            color: #8f8f8f;
+        }
+
+        .separator {
+            width: 1px;
+            height: 70%;
+            margin: auto 0;
+            background-color: #464646;
+        }
+
+        svg {
+            width: 36px;
+            color: crimson;
+            cursor: pointer;
+        }
+    }
+}
