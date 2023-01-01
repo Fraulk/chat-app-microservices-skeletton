@@ -5,6 +5,7 @@ from jose import jwt
 import redis
 import datetime
 import uuid
+import json
 
 r = redis.Redis(host='redis', port=6379)
 
@@ -72,13 +73,15 @@ async def websocket_endpoint(
     websocket: WebSocket,
     session: str = Depends(auth_token)
 ):
+    r = redis.Redis(host='redis', port=6379)
     # Obtention de l'identifiant du client
     client_id = session["id"]
+    username = session["username"]
     await manager.connect(websocket)
      # Récupération des 20 derniers messages
     messages = r.lrange('messages', -20, -1)
     for message in messages:
-        await websocket.send_text(message)
+        await websocket.send_text(message.decode())
 
     try:
         while True:
@@ -116,6 +119,7 @@ async def websocket_endpoint(
                 message = {
                     "id": uuid.uuid4().hex,  # Génération d'un ID unique pour le message
                     "client_id": client_id,
+                    "username": username,
                     "message": data['message'],
                     "date": datetime.datetime.utcnow().isoformat(),
                     "reaction": []
