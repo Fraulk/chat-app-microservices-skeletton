@@ -5,7 +5,7 @@
     flex-flow: column nowrap;
 
     .messages {
-        padding: 0 16px;
+        padding: 4px 16px;
         display: flex;
         flex-flow: column nowrap;
         gap: 10px;
@@ -24,6 +24,47 @@
                 span {
                     font-weight: 600;
                     letter-spacing: 1.1px;
+                }
+            }
+
+            // .reaction {
+            //     height: 0;
+            //     transition: height .2s ease-out;
+            // }
+            // &:hover 
+            .reactions {
+                display: flex;
+                gap: 4px;
+
+                .reaction {
+                    min-width: 18px;
+                    min-height: 18px;
+                    padding: 4px 4px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-weight: 300;
+                    color: #8f8f8f;
+                    font-size: 12px;
+                    background-color: #474747;
+                    border-radius: 2px;
+                    cursor: pointer;
+                }
+    
+                .new-reaction {
+                    width: 24px;
+                    // height: 18px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-weight: 300;
+                    color: #8f8f8f;
+                    font-size: 14px;
+                    background-color: #474747;
+                    border-radius: 2px;
+                    cursor: pointer;
                 }
             }
         }

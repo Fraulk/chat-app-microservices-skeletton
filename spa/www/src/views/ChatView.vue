@@ -13,40 +13,20 @@ cookies.set("session", token.value);
 const { send } = useWebSocket("ws://localhost/chat/ws", {
   onMessage: (_, event) => {
     console.log(event);
-    const data = event.data;
+    const data = JSON.parse(event.data);
     console.log(data);
-    messages.value.push(JSON.parse(data));
+    if (data.type == "reaction")
+      messages.value[messages.value.findIndex(item => item.id == data.id)].reaction = data.reaction
+    else
+      messages.value.push(data);
   },
 });
 
-const messages = ref([
-  {
-    type: "new_message",
-    id: "1332154648",
-    username: "LeBGdu90",
-    message: "Hello world!",
-    reaction: [
-      {
-        reaction: "poop",
-        client: ["<client_id_1>", "<client_id_2>"],
-      },
-    ],
-    date: new Date(),
-  },
-  {
-    type: "new_message",
-    id: "133212158",
-    username: "xXDark_SasukeXx",
-    message: "AAAA AAAAA A AAAAAAAA AAAAAA AAAA AA AAAAAA",
-    reaction: [
-      {
-        reaction: "poop",
-        client: ["<client_id_1>", "<client_id_2>"],
-      },
-    ],
-    date: new Date(),
-  },
-]);
+const messages = ref([]);
+
+const isAddingReaction = ref({});
+
+const addReaction = ref("");
 
 const payload = ref("");
 
@@ -56,18 +36,52 @@ function sendMessage() {
     payload.value = "";
   }
 }
+
+const inputReaction = (id) => {
+  isAddingReaction.value = {status: true, id}
+}
+
+const sendNewReaction = (id) => {
+  isAddingReaction.value = {status: false, id: ""}
+  const regexpEmojiPresentation = /\p{Emoji_Presentation}/u;
+  let reaction = addReaction.value.match(regexpEmojiPresentation)
+  if (reaction == null) return
+  send(JSON.stringify({ reaction: reaction[0], id}))
+}
+
+const sendExistentReaction = (id, reaction) => send(JSON.stringify({ reaction, id}))
+
 </script>
 
 <template>
   <div class="ChatView">
     <div class="messages">
-      <div class="message" :key="index" v-for="(message, index) in messages">
+      <article class="message" :key="index" v-for="(message, index) in messages">
         <div class="username">
-          <span>{{ message.username }}</span> said at
+          <span>{{ message.username ?? "Anonymous" }}</span> said at
           {{ new Date(message.date).toLocaleDateString() }}:
         </div>
         {{ message.message }}
-      </div>
+        <div class="reactions">
+          <div v-for="(react, i) in message.reaction" :key="i" @click="sendExistentReaction(message.id, react.reaction)" class="reaction">
+            {{ String.fromCodePoint(isNaN(react.reaction) ? "0x" + react.reaction.codePointAt(0).toString(16) : react.reaction) }}: {{ react.client.length }}
+          </div>
+          <div class="new-reaction" @click="inputReaction(message.id)">+</div>
+          <input
+            type="text"
+            v-if="isAddingReaction.status == true && isAddingReaction.id == message.id"
+            v-model="addReaction"
+            @keypress.enter="sendNewReaction(message.id)"
+          >
+          <div
+            v-if="isAddingReaction.status == true && isAddingReaction.id == message.id"
+            class="reaction"
+            @click="sendNewReaction(message.id)"
+          >
+            Send
+          </div>
+        </div>
+      </article>
     </div>
     <div class="send-message">
       <input
@@ -83,5 +97,5 @@ function sendMessage() {
 </template>
 
 <style lang="scss" scoped>
-@import "ChatView.scss";
+@import "../ChatView.scss";
 </style>
