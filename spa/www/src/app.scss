@@ -10,7 +10,7 @@
     background-color: #181818;
     z-index: 0;
 
-    & > img {
+    &>img {
         position: absolute;
         width: 100%;
         top: -8%;
@@ -28,8 +28,36 @@
         padding: 8px 0;
         position: relative;
         background-color: #2a2a2a;
+        border-radius: 10px;
+        outline: 10px solid black;
         transform: translateX(-31px) translateY(85px);
-        overflow: hidden;
+
+        &::before {
+            content: "";
+            display: block;
+            width: 105%;
+            height: 19px;
+            position: absolute;
+            left: -10px;
+            right: -10px;
+            background-color: black;
+            border-radius: 10px 10px 0 0;
+            transform: translateY(-22px);
+        }
+
+        &::after {
+            content: "";
+            display: block;
+            width: 105%;
+            height: 15px;
+            position: absolute;
+            left: -10px;
+            right: -10px;
+            bottom: 0;
+            background-color: black;
+            border-radius: 0 0 10px 10px;
+            transform: translateY(10px);
+        }
 
         nav {
             width: 100%;
@@ -40,7 +68,8 @@
             justify-content: space-around;
             border-top: 1px solid #424242;
 
-            a, span {
+            a,
+            span {
                 color: crimson;
                 cursor: pointer;
             }

@@ -11,7 +11,6 @@ const { token, isLoggedIn, logOut } = useUser();
 
 <template>
   <div class="App">
-    <img src="../assets/images/phone.webp" draggable="false" alt="">
     <div class="content">
     <!-- {{ isLoggedIn }} -->
     <!-- {{ token }} -->
