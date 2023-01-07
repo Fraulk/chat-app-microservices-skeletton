@@ -115,6 +115,8 @@ async def websocket_endpoint(
                     if reaction['reaction'] == data['reaction']:
                         if data['id'] in reaction['client']:
                             reaction['client'].remove(data['id'])
+                            if len(reaction['client']) == 0:
+                                message['reaction'].remove(reaction)
                         else:
                             reaction['client'].append(data['id'])
                         found = True
@@ -125,7 +127,7 @@ async def websocket_endpoint(
                 message['type'] = "reaction"
                 # Enregistrement du message mis à jour
                 r.set(key, json.dumps(message))
-                manager.broadcast
+
                 await manager.broadcast(json.dumps(message))
 
             else:
