@@ -113,22 +113,24 @@ async def websocket_endpoint(
                 found = False
                 for reaction in message['reaction']:
                     if reaction['reaction'] == data['reaction']:
-                        if data['id'] in reaction['client']:
-                            reaction['client'].remove(data['id'])
+                        if client_id in reaction['client']:
+                            reaction['client'].remove(client_id)
                             if len(reaction['client']) == 0:
                                 message['reaction'].remove(reaction)
                         else:
-                            reaction['client'].append(data['id'])
+                            reaction['client'].append(client_id)
                         found = True
                         break
                 if not found:
-                    message['reaction'].append({ "reaction": data['reaction'], "client": [data['id']] })
+                    message['reaction'].append({ "reaction": data['reaction'], "client": [client_id] })
 
                 message['type'] = "reaction"
                 # Enregistrement du message mis à jour
                 r.set(key, json.dumps(message))
+                r.rpush('messages', json.dumps(message))
 
-                await manager.broadcast(json.dumps(message))
+                # Publication du message sur le canal "chat"
+                r.publish('chat', json.dumps(message))
 
             else:
                 # Préparation du message
