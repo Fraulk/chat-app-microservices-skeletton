@@ -6,6 +6,7 @@ import redis
 import datetime
 import uuid
 import json
+import logging
 
 r = redis.Redis(host='redis', port=6379)
 
@@ -81,7 +82,17 @@ async def websocket_endpoint(
      # Récupération des 20 derniers messages
     messages = r.lrange('messages', -20, -1)
     for message in messages:
-        await websocket.send_text(message.decode())
+        # Convert the message into a dict
+        message = json.loads(message.decode())
+        
+        # Gets the reactions for the specified message and merge it to the current message
+        reaction = r.get(f"message:{message['id']}")
+        reaction = json.loads(reaction)["reaction"]
+        message['reaction'] = reaction
+
+        # Convert to json and send the response
+        message = json.dumps(message)
+        await websocket.send_text(message)
 
     try:
         while True:
@@ -100,19 +111,22 @@ async def websocket_endpoint(
 
                 # Vérification si l'utilisateur peut retirer ou ajouter une réaction
                 found = False
-                for r in message['reaction']:
-                    if r['reaction'] == data['reaction']:
-                        if data['client'] in r['client']:
-                            r['client'].remove(data['client'])
+                for reaction in message['reaction']:
+                    if reaction['reaction'] == data['reaction']:
+                        if data['id'] in reaction['client']:
+                            reaction['client'].remove(data['id'])
                         else:
-                            r['client'].append(data['client'])
+                            reaction['client'].append(data['id'])
                         found = True
                         break
                 if not found:
-                    message['reaction'].append({ "reaction": data['reaction'], "client": [data['client']] })
+                    message['reaction'].append({ "reaction": data['reaction'], "client": [data['id']] })
 
+                message['type'] = "reaction"
                 # Enregistrement du message mis à jour
                 r.set(key, json.dumps(message))
+                manager.broadcast
+                await manager.broadcast(json.dumps(message))
 
             else:
                 # Préparation du message
